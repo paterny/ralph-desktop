@@ -1,15 +1,19 @@
 <script lang="ts">
   import '../app.css';
   import { onMount } from 'svelte';
-  import { projects, currentProjectId, currentProject, updateProjects, updateCurrentProject } from '$lib/stores/projects';
+  import { projects, currentProjectId, currentProject, updateProjects, updateCurrentProject, selectProject } from '$lib/stores/projects';
   import { config, availableClis, updateConfig, setAvailableClis } from '$lib/stores/settings';
   import { loopState, setStatus, setIteration, addLog, setError } from '$lib/stores/loop';
   import * as api from '$lib/services/tauri';
   import type { LoopEvent } from '$lib/types';
+  import type { RecoveryInfo } from '$lib/services/tauri';
+  import RecoveryDialog from '$lib/components/RecoveryDialog.svelte';
 
   let { children } = $props();
   let initialized = $state(false);
   let showPermissionDialog = $state(false);
+  let showRecoveryDialog = $state(false);
+  let interruptedTasks = $state<RecoveryInfo[]>([]);
 
   onMount(async () => {
     try {
@@ -30,12 +34,23 @@
       const projectList = await api.listProjects();
       updateProjects(projectList);
 
+      // Check for interrupted tasks
+      const interrupted = await api.checkInterruptedTasks();
+      if (interrupted.length > 0) {
+        interruptedTasks = interrupted;
+        showRecoveryDialog = true;
+      }
+
       // Listen to loop events
       await api.listenToLoopEvents(handleLoopEvent);
+
+      // Clean up old logs on startup
+      await api.cleanupLogs();
 
       initialized = true;
     } catch (error) {
       console.error('Initialization error:', error);
+      initialized = true; // Still show UI even on error
     }
   });
 
@@ -79,6 +94,25 @@
     updateConfig(loadedConfig);
     showPermissionDialog = false;
   }
+
+  function handleRecoverTask(projectId: string) {
+    selectProject(projectId);
+    interruptedTasks = interruptedTasks.filter(t => t.projectId !== projectId);
+    if (interruptedTasks.length === 0) {
+      showRecoveryDialog = false;
+    }
+  }
+
+  function handleCancelTask(projectId: string) {
+    interruptedTasks = interruptedTasks.filter(t => t.projectId !== projectId);
+    if (interruptedTasks.length === 0) {
+      showRecoveryDialog = false;
+    }
+  }
+
+  function handleDismissRecovery() {
+    showRecoveryDialog = false;
+  }
 </script>
 
 {#if showPermissionDialog}
@@ -117,6 +151,15 @@
       </div>
     </div>
   </div>
+{/if}
+
+{#if showRecoveryDialog && interruptedTasks.length > 0}
+  <RecoveryDialog
+    tasks={interruptedTasks}
+    onRecover={handleRecoverTask}
+    onCancel={handleCancelTask}
+    onDismiss={handleDismissRecovery}
+  />
 {/if}
 
 {#if initialized}

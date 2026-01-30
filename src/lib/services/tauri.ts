@@ -96,6 +96,30 @@ export async function getLoopStatus(projectId: string): Promise<boolean> {
   return invoke('get_loop_status', { projectId });
 }
 
+// Recovery Commands
+export interface RecoveryInfo {
+  projectId: string;
+  projectName: string;
+  iteration: number;
+  status: string;
+}
+
+export async function checkInterruptedTasks(): Promise<RecoveryInfo[]> {
+  return invoke('check_interrupted_tasks');
+}
+
+export async function cancelInterruptedTask(projectId: string): Promise<void> {
+  return invoke('cancel_interrupted_task', { projectId });
+}
+
+export async function cleanupLogs(): Promise<number> {
+  return invoke('cleanup_logs');
+}
+
+export async function getProjectLogs(projectId: string): Promise<string[]> {
+  return invoke('get_project_logs', { projectId });
+}
+
 // Event Listeners
 export async function listenToLoopEvents(
   callback: (event: LoopEvent) => void
