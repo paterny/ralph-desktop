@@ -37,6 +37,11 @@ pub fn run() {
             commands::resume_loop,
             commands::stop_loop,
             commands::get_loop_status,
+            // Recovery commands
+            commands::check_interrupted_tasks,
+            commands::cancel_interrupted_task,
+            commands::cleanup_logs,
+            commands::get_project_logs,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

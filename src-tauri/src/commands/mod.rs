@@ -12,6 +12,7 @@ use uuid::Uuid;
 
 pub mod loop_commands;
 pub mod project_commands;
+pub mod recovery_commands;
 
 /// Application state shared across commands
 #[derive(Clone)]
@@ -36,3 +37,4 @@ impl Default for AppState {
 // Re-export commands
 pub use loop_commands::*;
 pub use project_commands::*;
+pub use recovery_commands::*;

@@ -1,6 +1,5 @@
 use crate::adapters::{get_adapter, CliAdapter};
-use crate::storage::models::{CliType, ExecutionState, ProjectStatus};
-use chrono::Utc;
+use crate::storage::models::CliType;
 use serde::Serialize;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -8,10 +7,10 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tauri::{AppHandle, Emitter};
 use tokio::io::{AsyncBufReadExt, BufReader};
-use tokio::process::Child;
-use tokio::sync::{mpsc, Notify};
+use tokio::sync::Notify;
 
 pub mod brainstorm;
+pub mod logs;
 
 /// Loop events sent to frontend
 #[derive(Debug, Clone, Serialize)]
