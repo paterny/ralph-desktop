@@ -8,10 +8,28 @@
   import TaskDetail from '$lib/components/TaskDetail.svelte';
   import BrainstormWizard from '$lib/components/BrainstormWizard.svelte';
   import SettingsPanel from '$lib/components/SettingsPanel.svelte';
+  import QueueStatus from '$lib/components/QueueStatus.svelte';
+  import ShortcutsHelp from '$lib/components/ShortcutsHelp.svelte';
+  import KeyboardShortcuts from '$lib/components/KeyboardShortcuts.svelte';
 
   let showBrainstorm = $state(false);
   let showSettings = $state(false);
+  let showShortcuts = $state(false);
   let creatingProject = $state(false);
+
+  // Keyboard shortcuts
+  const shortcuts = [
+    { key: 'n', ctrl: true, action: handleCreateProject, description: '新建项目' },
+    { key: ',', ctrl: true, action: () => showSettings = true, description: '打开设置' },
+    { key: '?', ctrl: true, action: () => showShortcuts = true, description: '显示快捷键' },
+    { key: 'Escape', action: handleEscape, description: '关闭对话框' },
+  ];
+
+  function handleEscape() {
+    if (showSettings) showSettings = false;
+    else if (showShortcuts) showShortcuts = false;
+    else if (showBrainstorm) showBrainstorm = false;
+  }
 
   // Reactive: load project details when selection changes
   $effect(() => {
@@ -136,6 +154,7 @@
     </div>
 
     <!-- Status Bar -->
+    <QueueStatus />
     <div class="p-3 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
       <div class="flex justify-between">
         <span>CLI: {$availableClis.find(c => c.available)?.name || 'None'}</span>
@@ -176,3 +195,9 @@
 {#if showSettings}
   <SettingsPanel onClose={() => showSettings = false} />
 {/if}
+
+<!-- Shortcuts Help -->
+<ShortcutsHelp show={showShortcuts} onClose={() => showShortcuts = false} />
+
+<!-- Keyboard Shortcuts Handler -->
+<KeyboardShortcuts {shortcuts} />
