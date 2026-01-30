@@ -7,8 +7,10 @@
   import ProjectList from '$lib/components/ProjectList.svelte';
   import TaskDetail from '$lib/components/TaskDetail.svelte';
   import BrainstormWizard from '$lib/components/BrainstormWizard.svelte';
+  import SettingsPanel from '$lib/components/SettingsPanel.svelte';
 
   let showBrainstorm = $state(false);
+  let showSettings = $state(false);
   let creatingProject = $state(false);
 
   // Reactive: load project details when selection changes
@@ -86,12 +88,6 @@
     clearLogs();
   }
 
-  // Get running count
-  const runningCount = $derived($projects.filter(p => {
-    // This is simplified - in real app we'd track status per project
-    return false;
-  }).length);
-
   const availableCliCount = $derived($availableClis.filter(c => c.available).length);
 </script>
 
@@ -99,9 +95,18 @@
   <!-- Sidebar -->
   <div class="w-72 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
     <!-- Header -->
-    <div class="p-4 border-b border-gray-200 dark:border-gray-700">
-      <h1 class="text-xl font-bold text-gray-800 dark:text-white">Ralph Desktop</h1>
-      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Visual Ralph Loop Controller</p>
+    <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+      <div>
+        <h1 class="text-xl font-bold text-gray-800 dark:text-white">Ralph Desktop</h1>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Visual Ralph Loop Controller</p>
+      </div>
+      <button
+        class="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+        onclick={() => showSettings = true}
+        title="设置"
+      >
+        ⚙️
+      </button>
     </div>
 
     <!-- New Project Button -->
@@ -165,3 +170,8 @@
     {/if}
   </div>
 </div>
+
+<!-- Settings Panel -->
+{#if showSettings}
+  <SettingsPanel onClose={() => showSettings = false} />
+{/if}
