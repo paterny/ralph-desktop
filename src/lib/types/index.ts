@@ -33,6 +33,7 @@ export interface ProjectState {
   name: string;
   path: string;
   status: ProjectStatus;
+  skipGitRepoCheck?: boolean;
   brainstorm?: BrainstormState;
   task?: TaskConfig;
   execution?: ExecutionState;

@@ -1,6 +1,6 @@
 import { writable, derived, get } from 'svelte/store';
 import type { ProjectMeta } from '../types';
-import * as api from '$lib/services/tauri';
+import { startLoopWithGuard } from '$lib/services/loopStart';
 
 // Queue of projects waiting to run
 export const projectQueue = writable<string[]>([]);
@@ -65,14 +65,16 @@ async function processQueue() {
 
   if (status.canStartMore && queue.length > 0) {
     const nextProjectId = queue[0];
-    dequeueProject(nextProjectId);
-    markRunning(nextProjectId);
-
     try {
-      await api.startLoop(nextProjectId);
+      const started = await startLoopWithGuard(nextProjectId);
+      if (!started) {
+        return;
+      }
+      dequeueProject(nextProjectId);
+      markRunning(nextProjectId);
     } catch (error) {
       console.error('Failed to start queued project:', error);
-      markStopped(nextProjectId);
+      dequeueProject(nextProjectId);
     }
   }
 }

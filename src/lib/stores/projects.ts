@@ -1,5 +1,5 @@
 import { writable, derived } from 'svelte/store';
-import type { ProjectMeta, ProjectState } from '../types';
+import type { ProjectMeta, ProjectState, ProjectStatus } from '../types';
 
 // Project list
 export const projects = writable<ProjectMeta[]>([]);
@@ -36,4 +36,12 @@ export function removeProject(id: string) {
 
 export function updateCurrentProject(state: ProjectState) {
   currentProject.set(state);
+}
+
+export function updateProjectStatus(id: string, status: ProjectStatus) {
+  projects.update(list => list.map(p => p.id === id ? { ...p, status } : p));
+  currentProject.update(current => {
+    if (!current || current.id !== id) return current;
+    return { ...current, status };
+  });
 }

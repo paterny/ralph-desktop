@@ -25,8 +25,8 @@ impl Default for GlobalConfig {
             default_cli: CliType::Claude,
             default_max_iterations: 10,
             max_concurrent_projects: 3,
-            iteration_timeout_ms: 600000, // 10 minutes
-            idle_timeout_ms: 120000,      // 2 minutes
+            iteration_timeout_ms: 0, // 0 = no timeout
+            idle_timeout_ms: 0,      // 0 = no timeout
             theme: Theme::System,
             log_retention_days: 7,
             permissions_confirmed: false,
@@ -86,6 +86,8 @@ pub struct ProjectState {
     pub name: String,
     pub path: String,
     pub status: ProjectStatus,
+    #[serde(default)]
+    pub skip_git_repo_check: bool,
     pub brainstorm: Option<BrainstormState>,
     pub task: Option<TaskConfig>,
     pub execution: Option<ExecutionState>,

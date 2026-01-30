@@ -34,14 +34,14 @@
   onscroll={handleScroll}
 >
   {#if logs.length === 0}
-    <div class="text-gray-500 text-center py-8">
+    <div class="text-vscode-muted text-center py-8">
       等待日志输出...
     </div>
   {:else}
     {#each logs as log, i (i)}
-      <div class="flex gap-2 hover:bg-gray-800/50 py-0.5 {log.isStderr ? 'text-red-400' : 'text-green-400'}">
-        <span class="text-gray-600 shrink-0">[#{log.iteration}]</span>
-        <span class="text-gray-500 shrink-0">{formatTime(log.timestamp)}</span>
+      <div class="flex gap-2 hover:bg-vscode-hover py-0.5 {log.isStderr ? 'text-vscode-error' : 'text-vscode'}">
+        <span class="text-vscode-muted shrink-0">[#{log.iteration}]</span>
+        <span class="text-vscode-muted shrink-0">{formatTime(log.timestamp)}</span>
         <span class="break-all">{log.content}</span>
       </div>
     {/each}
@@ -49,7 +49,7 @@
 
   {#if !autoScroll && logs.length > 0}
     <button
-      class="fixed bottom-20 right-8 px-3 py-1 bg-blue-600 text-white rounded-full text-xs shadow-lg hover:bg-blue-700"
+      class="fixed bottom-20 right-8 px-3 py-1 bg-vscode-accent bg-vscode-accent-hover text-white rounded-full text-xs shadow-lg"
       onclick={() => {
         autoScroll = true;
         container.scrollTop = container.scrollHeight;

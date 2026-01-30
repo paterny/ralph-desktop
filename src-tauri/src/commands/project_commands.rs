@@ -45,6 +45,7 @@ pub async fn create_project(path: String, name: String) -> Result<ProjectState, 
         name,
         path,
         status: ProjectStatus::Brainstorming,
+        skip_git_repo_check: false,
         brainstorm: Some(BrainstormState {
             answers: vec![],
             completed_at: None,
@@ -65,6 +66,39 @@ pub async fn create_project(path: String, name: String) -> Result<ProjectState, 
 pub async fn get_project(id: String) -> Result<ProjectState, String> {
     let uuid = Uuid::parse_str(&id).map_err(|e| e.to_string())?;
     storage::load_project_state(&uuid).map_err(|e| e.to_string())
+}
+
+/// Set whether to skip git repo check for a project
+#[tauri::command]
+pub async fn set_project_skip_git_repo_check(
+    project_id: String,
+    skip: bool,
+) -> Result<ProjectState, String> {
+    let uuid = Uuid::parse_str(&project_id).map_err(|e| e.to_string())?;
+    let mut state = storage::load_project_state(&uuid).map_err(|e| e.to_string())?;
+    state.skip_git_repo_check = skip;
+    state.updated_at = Utc::now();
+    storage::save_project_state(&state).map_err(|e| e.to_string())?;
+    Ok(state)
+}
+
+/// Initialize git repository in project directory
+#[tauri::command]
+pub async fn init_project_git_repo(project_id: String) -> Result<(), String> {
+    let uuid = Uuid::parse_str(&project_id).map_err(|e| e.to_string())?;
+    let state = storage::load_project_state(&uuid).map_err(|e| e.to_string())?;
+    let output = std::process::Command::new("git")
+        .arg("init")
+        .current_dir(state.path)
+        .output()
+        .map_err(|e| format!("Failed to run git: {}", e))?;
+
+    if output.status.success() {
+        Ok(())
+    } else {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        Err(format!("git init failed: {}", stderr.trim()))
+    }
 }
 
 /// Delete a project

@@ -1,6 +1,9 @@
 use super::*;
-use crate::engine::LoopEngine;
+use crate::engine::{LoopEngine, LoopEvent, CODEX_GIT_REPO_CHECK_REQUIRED};
 use std::path::PathBuf;
+use std::time::Duration;
+use tauri::Emitter;
+use tokio::process::Command;
 
 /// Start Ralph Loop for a project
 #[tauri::command]
@@ -14,21 +17,43 @@ pub async fn start_loop(
 
     let task = project_state
         .task
-        .as_ref()
+        .as_mut()
         .ok_or("No task configured for this project")?;
 
     let config = storage::load_config().map_err(|e| e.to_string())?;
+    let project_path = PathBuf::from(&project_state.path);
+
+    let _prompt_updated = ensure_autodecide_prompt(task);
+
+    if task.cli == CliType::Codex && !project_state.skip_git_repo_check {
+        let is_repo = is_git_repo(&project_path).await?;
+        if !is_repo {
+            return Err(CODEX_GIT_REPO_CHECK_REQUIRED.to_string());
+        }
+    }
+
+    let iteration_timeout = if config.iteration_timeout_ms == 0 {
+        None
+    } else {
+        Some(Duration::from_millis(config.iteration_timeout_ms))
+    };
+    let idle_timeout = if config.idle_timeout_ms == 0 {
+        None
+    } else {
+        Some(Duration::from_millis(config.idle_timeout_ms))
+    };
 
     // Create loop engine
     let engine = LoopEngine::new(
         project_id.clone(),
-        PathBuf::from(&project_state.path),
+        project_path,
         task.cli,
         task.prompt.clone(),
         task.max_iterations,
         task.completion_signal.clone(),
-        config.iteration_timeout_ms,
-        config.idle_timeout_ms,
+        iteration_timeout,
+        idle_timeout,
+        project_state.skip_git_repo_check,
         app_handle.clone(),
     );
 
@@ -96,6 +121,45 @@ pub async fn start_loop(
     Ok(())
 }
 
+const AUTO_DECIDE_MARKER: &str = "[Ralph Auto-Decision Policy]";
+
+fn ensure_autodecide_prompt(task: &mut TaskConfig) -> bool {
+    if task.prompt.contains(AUTO_DECIDE_MARKER) {
+        return false;
+    }
+
+    let policy = [
+        AUTO_DECIDE_MARKER,
+        "You MUST NOT ask the user any questions during execution.",
+        "Assume the user is away and cannot respond.",
+        "If multiple valid choices exist, prefer the more maintainable, clear, engineering-oriented option.",
+        "If required information is missing, make reasonable assumptions and proceed without blocking.",
+        "Never pause for clarification; log assumptions in the output when necessary.",
+    ]
+    .join("\n");
+
+    task.prompt = format!("{policy}\n\n{}", task.prompt.trim());
+    true
+}
+
+async fn is_git_repo(project_path: &PathBuf) -> Result<bool, String> {
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(project_path)
+        .arg("rev-parse")
+        .arg("--is-inside-work-tree")
+        .output()
+        .await
+        .map_err(|e| format!("Failed to run git: {}", e))?;
+
+    if !output.status.success() {
+        return Ok(false);
+    }
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    Ok(stdout.trim() == "true")
+}
+
 /// Pause Ralph Loop
 #[tauri::command]
 pub async fn pause_loop(
@@ -150,16 +214,39 @@ pub async fn resume_loop(
 /// Stop Ralph Loop
 #[tauri::command]
 pub async fn stop_loop(
+    app_handle: AppHandle,
     state: State<'_, AppState>,
     project_id: String,
 ) -> Result<(), String> {
     let uuid = Uuid::parse_str(&project_id).map_err(|e| e.to_string())?;
 
-    let loops = state.running_loops.read().await;
-    if let Some(handle) = loops.get(&uuid) {
-        handle.stop_flag.store(true, std::sync::atomic::Ordering::SeqCst);
-        handle.resume_notify.notify_one(); // In case it's paused
+    let mut found = false;
+    {
+        let loops = state.running_loops.read().await;
+        if let Some(handle) = loops.get(&uuid) {
+            handle.stop_flag.store(true, std::sync::atomic::Ordering::SeqCst);
+            handle.resume_notify.notify_one(); // In case it's paused
+            found = true;
+        }
+    }
 
+    if let Ok(mut project_state) = storage::load_project_state(&uuid) {
+        project_state.status = ProjectStatus::Cancelled;
+        if let Some(ref mut exec) = project_state.execution {
+            exec.completed_at = Some(Utc::now());
+        }
+        project_state.updated_at = Utc::now();
+        let _ = storage::save_project_state(&project_state);
+    }
+
+    let _ = app_handle.emit(
+        "loop-event",
+        LoopEvent::Stopped {
+            project_id: project_id.clone(),
+        },
+    );
+
+    if found {
         Ok(())
     } else {
         Err("Loop not running for this project".to_string())

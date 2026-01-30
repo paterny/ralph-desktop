@@ -22,6 +22,11 @@ pub enum LineType {
     Error,
 }
 
+#[derive(Debug, Clone, Copy, Default)]
+pub struct CommandOptions {
+    pub skip_git_repo_check: bool,
+}
+
 /// CLI adapter trait for different CLI implementations
 #[async_trait]
 pub trait CliAdapter: Send + Sync {
@@ -41,10 +46,15 @@ pub trait CliAdapter: Send + Sync {
     async fn version(&self) -> Option<String>;
 
     /// Build command for execution
-    fn build_command(&self, prompt: &str, working_dir: &Path) -> Command;
+    fn build_command(&self, prompt: &str, working_dir: &Path, options: CommandOptions) -> Command;
 
     /// Build readonly command for brainstorm
-    fn build_readonly_command(&self, prompt: &str, working_dir: &Path) -> Command;
+    fn build_readonly_command(
+        &self,
+        prompt: &str,
+        working_dir: &Path,
+        options: CommandOptions,
+    ) -> Command;
 
     /// Detect completion signal in output
     fn detect_completion(&self, output: &str, signal: &str) -> bool;

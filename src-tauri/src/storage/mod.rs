@@ -46,7 +46,22 @@ pub fn load_config() -> Result<GlobalConfig> {
     }
 
     let content = fs::read_to_string(&config_path)?;
-    let config: GlobalConfig = serde_json::from_str(&content)?;
+    let mut config: GlobalConfig = serde_json::from_str(&content)?;
+    let mut updated = false;
+
+    if config.iteration_timeout_ms == 600000 {
+        config.iteration_timeout_ms = 0;
+        updated = true;
+    }
+    if config.idle_timeout_ms == 120000 {
+        config.idle_timeout_ms = 0;
+        updated = true;
+    }
+
+    if updated {
+        save_config(&config)?;
+    }
+
     Ok(config)
 }
 

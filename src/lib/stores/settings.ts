@@ -6,8 +6,8 @@ const defaultConfig: GlobalConfig = {
   defaultCli: 'claude',
   defaultMaxIterations: 50,
   maxConcurrentProjects: 3,
-  iterationTimeoutMs: 600000,
-  idleTimeoutMs: 120000,
+  iterationTimeoutMs: 0,
+  idleTimeoutMs: 0,
   theme: 'system',
   logRetentionDays: 7,
   permissionsConfirmed: false

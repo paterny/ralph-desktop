@@ -24,6 +24,17 @@ export async function getProject(id: string): Promise<ProjectState> {
   return invoke('get_project', { id });
 }
 
+export async function setProjectSkipGitRepoCheck(
+  projectId: string,
+  skip: boolean
+): Promise<ProjectState> {
+  return invoke('set_project_skip_git_repo_check', { projectId, skip });
+}
+
+export async function initProjectGitRepo(projectId: string): Promise<void> {
+  return invoke('init_project_git_repo', { projectId });
+}
+
 export async function deleteProject(id: string): Promise<void> {
   return invoke('delete_project', { id });
 }

@@ -11,6 +11,7 @@
   import QueueStatus from '$lib/components/QueueStatus.svelte';
   import ShortcutsHelp from '$lib/components/ShortcutsHelp.svelte';
   import KeyboardShortcuts from '$lib/components/KeyboardShortcuts.svelte';
+  import CliNotInstalled from '$lib/components/CliNotInstalled.svelte';
 
   let showBrainstorm = $state(false);
   let showSettings = $state(false);
@@ -110,36 +111,38 @@
   const availableCliCount = $derived($availableClis.filter(c => c.available).length);
 </script>
 
-<div class="flex h-screen bg-gray-100 dark:bg-gray-900">
+<div class="flex h-screen bg-vscode-editor">
   <!-- Sidebar -->
-  <div class="w-72 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+  <div class="w-64 bg-vscode-sidebar border-r border-vscode flex flex-col">
     <!-- Header -->
-    <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+    <div class="px-4 py-3 flex items-center justify-between">
       <div>
-        <h1 class="text-xl font-bold text-gray-800 dark:text-white">Ralph Desktop</h1>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Visual Ralph Loop Controller</p>
+        <h1 class="text-sm font-semibold text-vscode uppercase tracking-wide">Ralph Desktop</h1>
       </div>
       <button
-        class="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+        class="p-1.5 text-vscode-dim hover:text-vscode hover:bg-vscode-hover rounded"
         onclick={() => showSettings = true}
-        title="设置"
+        title="Settings"
       >
-        ⚙️
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
       </button>
     </div>
 
     <!-- New Project Button -->
-    <div class="p-3">
+    <div class="px-3 pb-2">
       <button
-        class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-2 disabled:opacity-50"
+        class="w-full py-1.5 px-3 bg-vscode-accent hover:bg-vscode-accent-hover text-white text-sm rounded flex items-center justify-center gap-2 disabled:opacity-50"
         onclick={handleCreateProject}
         disabled={creatingProject || availableCliCount === 0}
       >
-        <span class="text-lg">+</span>
+        <span>+</span>
         <span>New Project</span>
       </button>
       {#if availableCliCount === 0}
-        <p class="text-xs text-red-500 mt-2 text-center">未检测到 CLI，请先安装 Claude Code 或 Codex</p>
+        <p class="text-xs text-[#f14c4c] mt-2 text-center">No CLI detected</p>
       {/if}
     </div>
 
@@ -155,17 +158,20 @@
 
     <!-- Status Bar -->
     <QueueStatus />
-    <div class="p-3 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
+    <div class="px-3 py-2 border-t border-vscode text-xs text-vscode-muted">
       <div class="flex justify-between">
-        <span>CLI: {$availableClis.find(c => c.available)?.name || 'None'}</span>
-        <span>Projects: {$projects.length}</span>
+        <span>{$availableClis.find(c => c.available)?.name || 'No CLI'}</span>
+        <span>{$projects.length} projects</span>
       </div>
     </div>
   </div>
 
   <!-- Main Content -->
-  <div class="flex-1 flex flex-col overflow-hidden">
-    {#if $currentProject}
+  <div class="flex-1 flex flex-col overflow-hidden bg-vscode-editor">
+    {#if availableCliCount === 0}
+      <!-- No CLI Installed -->
+      <CliNotInstalled clis={$availableClis} />
+    {:else if $currentProject}
       {#if showBrainstorm}
         <AiBrainstorm
           project={$currentProject}
@@ -181,10 +187,10 @@
     {:else}
       <!-- Empty State -->
       <div class="flex-1 flex items-center justify-center">
-        <div class="text-center text-gray-500 dark:text-gray-400">
-          <div class="text-6xl mb-4">📁</div>
-          <h2 class="text-xl font-medium mb-2">选择或创建一个项目</h2>
-          <p class="text-sm">点击左侧 "New Project" 开始</p>
+        <div class="text-center text-vscode-dim">
+          <div class="text-5xl mb-4 opacity-30">📁</div>
+          <h2 class="text-base font-medium mb-1 text-vscode">Select or create a project</h2>
+          <p class="text-sm text-vscode-muted">Click "New Project" to get started</p>
         </div>
       </div>
     {/if}

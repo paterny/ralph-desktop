@@ -10,65 +10,67 @@
 
   let { projects, selectedId, onSelect, onDelete }: Props = $props();
 
-  const statusConfig: Record<ProjectStatus, { icon: string; color: string; animate?: boolean }> = {
-    brainstorming: { icon: '💭', color: 'text-purple-500' },
-    ready: { icon: '⚪', color: 'text-gray-400' },
-    queued: { icon: '🔵', color: 'text-blue-500' },
-    running: { icon: '🟢', color: 'text-green-500', animate: true },
-    pausing: { icon: '🟡', color: 'text-yellow-500', animate: true },
-    paused: { icon: '🟡', color: 'text-yellow-500' },
-    done: { icon: '✅', color: 'text-green-600' },
-    failed: { icon: '❌', color: 'text-red-500' },
-    cancelled: { icon: '🚫', color: 'text-gray-500' }
+  // Simple colored dot for status
+  const statusColors: Record<ProjectStatus, string> = {
+    brainstorming: '#a855f7',  // purple
+    ready: '#6e6e6e',          // gray
+    queued: '#3794ff',         // blue
+    running: '#4ec9b0',        // green
+    pausing: '#cca700',        // yellow
+    paused: '#cca700',         // yellow
+    done: '#4ec9b0',           // green
+    failed: '#f14c4c',         // red
+    cancelled: '#6e6e6e'       // gray
   };
 
-  function getStatusInfo(status: ProjectStatus) {
-    return statusConfig[status] || statusConfig.ready;
+  const animatedStatuses: ProjectStatus[] = ['running', 'pausing'];
+
+  function getStatusColor(status: ProjectStatus) {
+    return statusColors[status] || statusColors.ready;
   }
 
-  function formatDate(dateStr: string): string {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+  function shouldAnimate(status: ProjectStatus) {
+    return animatedStatuses.includes(status);
   }
 </script>
 
-<div class="divide-y divide-gray-100 dark:divide-gray-700">
+<div class="">
   {#if projects.length === 0}
-    <div class="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">
-      暂无项目
+    <div class="px-4 py-6 text-center text-vscode-muted text-sm">
+      No projects
     </div>
   {:else}
     {#each projects as project (project.id)}
-      {@const statusInfo = getStatusInfo(project.status)}
       <div
-        class="w-full p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group cursor-pointer
-          {selectedId === project.id ? 'bg-blue-50 dark:bg-blue-900/30 border-l-2 border-blue-600' : ''}"
+        class="w-full px-4 py-2 text-left hover:bg-vscode-hover transition-colors group cursor-pointer flex items-center gap-3
+          {selectedId === project.id ? 'bg-vscode-active' : ''}"
         onclick={() => onSelect(project.id)}
         onkeydown={(e) => e.key === 'Enter' && onSelect(project.id)}
         role="button"
         tabindex="0"
       >
-        <div class="flex items-start gap-2">
-          <span class="text-lg mt-0.5 {statusInfo.animate ? 'animate-pulse' : ''}">{statusInfo.icon}</span>
-          <div class="flex-1 min-w-0">
-            <div class="font-medium text-gray-800 dark:text-white truncate">
-              {project.name}
-            </div>
-            <div class="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
-              {project.path}
-            </div>
-            <div class="text-xs text-gray-400 dark:text-gray-500 mt-1">
-              {formatDate(project.lastOpenedAt)}
-            </div>
+        <!-- Simple status dot -->
+        <div
+          class="w-2 h-2 rounded-full flex-shrink-0 {shouldAnimate(project.status) ? 'animate-pulse' : ''}"
+          style="background-color: {getStatusColor(project.status)}"
+        ></div>
+        <div class="flex-1 min-w-0">
+          <div class="text-sm text-vscode truncate">
+            {project.name}
           </div>
-          <button
-            class="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-500"
-            onclick={(e) => { e.stopPropagation(); onDelete(project.id); }}
-            title="删除项目"
-          >
-            ✕
-          </button>
+          <div class="text-xs text-vscode-muted truncate">
+            {project.path}
+          </div>
         </div>
+        <button
+          class="opacity-0 group-hover:opacity-100 p-1 hover:bg-[#f14c4c20] rounded text-[#f14c4c]"
+          onclick={(e) => { e.stopPropagation(); onDelete(project.id); }}
+          title="Delete"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
       </div>
     {/each}
   {/if}

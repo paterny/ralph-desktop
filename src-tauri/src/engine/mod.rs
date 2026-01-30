@@ -1,4 +1,4 @@
-use crate::adapters::{get_adapter, CliAdapter};
+use crate::adapters::{get_adapter, CommandOptions};
 use crate::storage::models::CliType;
 use serde::Serialize;
 use std::path::PathBuf;
@@ -12,6 +12,8 @@ use tokio::sync::Notify;
 pub mod ai_brainstorm;
 pub mod brainstorm;
 pub mod logs;
+
+pub const CODEX_GIT_REPO_CHECK_REQUIRED: &str = "codex_git_repo_check_required";
 
 /// Loop events sent to frontend
 #[derive(Debug, Clone, Serialize)]
@@ -65,8 +67,9 @@ pub struct LoopEngine {
     prompt: String,
     max_iterations: u32,
     completion_signal: String,
-    iteration_timeout: Duration,
-    idle_timeout: Duration,
+    iteration_timeout: Option<Duration>,
+    idle_timeout: Option<Duration>,
+    skip_git_repo_check: bool,
     pause_requested: Arc<AtomicBool>,
     stop_requested: Arc<AtomicBool>,
     resume_notify: Arc<Notify>,
@@ -81,8 +84,9 @@ impl LoopEngine {
         prompt: String,
         max_iterations: u32,
         completion_signal: String,
-        iteration_timeout_ms: u64,
-        idle_timeout_ms: u64,
+        iteration_timeout: Option<Duration>,
+        idle_timeout: Option<Duration>,
+        skip_git_repo_check: bool,
         app_handle: AppHandle,
     ) -> Self {
         Self {
@@ -92,13 +96,20 @@ impl LoopEngine {
             prompt,
             max_iterations,
             completion_signal,
-            iteration_timeout: Duration::from_millis(iteration_timeout_ms),
-            idle_timeout: Duration::from_millis(idle_timeout_ms),
+            iteration_timeout,
+            idle_timeout,
+            skip_git_repo_check,
             pause_requested: Arc::new(AtomicBool::new(false)),
             stop_requested: Arc::new(AtomicBool::new(false)),
             resume_notify: Arc::new(Notify::new()),
             app_handle,
         }
+    }
+
+    fn is_codex_git_repo_check_error(&self, line: &str) -> bool {
+        self.cli_type == CliType::Codex
+            && line.contains("Not inside a trusted directory")
+            && line.contains("skip-git-repo-check")
     }
 
     fn emit_event(&self, event: LoopEvent) {
@@ -157,10 +168,13 @@ impl LoopEngine {
                 iteration,
             });
 
-            let iteration_deadline = Instant::now() + self.iteration_timeout;
+            let iteration_deadline = self.iteration_timeout.map(|timeout| Instant::now() + timeout);
 
             // Build and spawn command
-            let mut cmd = adapter.build_command(&self.prompt, &self.project_path);
+            let options = CommandOptions {
+                skip_git_repo_check: self.skip_git_repo_check,
+            };
+            let mut cmd = adapter.build_command(&self.prompt, &self.project_path, options);
             let mut child = match cmd.spawn() {
                 Ok(c) => c,
                 Err(e) => {
@@ -238,12 +252,21 @@ impl LoopEngine {
                     }, if !stderr_done => {
                         match line {
                             Ok(Some(line)) => {
+                                if self.is_codex_git_repo_check_error(&line) {
+                                    self.emit_event(LoopEvent::Error {
+                                        project_id: self.project_id.clone(),
+                                        iteration,
+                                        error: CODEX_GIT_REPO_CHECK_REQUIRED.to_string(),
+                                    });
+                                    let _ = child.kill().await;
+                                    return Ok(LoopState::Failed { iteration });
+                                }
                                 last_output_time = Instant::now();
                                 self.emit_event(LoopEvent::Output {
                                     project_id: self.project_id.clone(),
                                     iteration,
                                     content: line,
-                                    is_stderr: true,
+                                    is_stderr: self.cli_type != CliType::Codex,
                                 });
                             }
                             Ok(None) => stderr_done = true,
@@ -256,25 +279,29 @@ impl LoopEngine {
                         let now = Instant::now();
 
                         // Iteration timeout
-                        if now >= iteration_deadline {
-                            self.emit_event(LoopEvent::Error {
-                                project_id: self.project_id.clone(),
-                                iteration,
-                                error: format!("Iteration timeout: exceeded {:?}", self.iteration_timeout),
-                            });
-                            let _ = child.kill().await;
-                            break;
+                        if let Some(deadline) = iteration_deadline {
+                            if now >= deadline {
+                                self.emit_event(LoopEvent::Error {
+                                    project_id: self.project_id.clone(),
+                                    iteration,
+                                    error: format!("Iteration timeout: exceeded {:?}", self.iteration_timeout),
+                                });
+                                let _ = child.kill().await;
+                                break;
+                            }
                         }
 
                         // Idle timeout
-                        if now.duration_since(last_output_time) > self.idle_timeout {
-                            self.emit_event(LoopEvent::Error {
-                                project_id: self.project_id.clone(),
-                                iteration,
-                                error: format!("Idle timeout: no output for {:?}", self.idle_timeout),
-                            });
-                            let _ = child.kill().await;
-                            break;
+                        if let Some(idle_timeout) = self.idle_timeout {
+                            if now.duration_since(last_output_time) > idle_timeout {
+                                self.emit_event(LoopEvent::Error {
+                                    project_id: self.project_id.clone(),
+                                    iteration,
+                                    error: format!("Idle timeout: no output for {:?}", self.idle_timeout),
+                                });
+                                let _ = child.kill().await;
+                                break;
+                            }
                         }
                     }
                 }

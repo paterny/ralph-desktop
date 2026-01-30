@@ -1,1 +1,136 @@
 @import 'tailwindcss';
+
+/* VS Code Default Dark Modern Theme */
+:root {
+  /* Backgrounds */
+  --vscode-editor-bg: #1e1e1e;
+  --vscode-sidebar-bg: #252526;
+  --vscode-panel-bg: #2d2d30;
+  --vscode-input-bg: #3c3c3c;
+  --vscode-dropdown-bg: #3c3c3c;
+
+  /* Borders */
+  --vscode-border: #3e3e42;
+  --vscode-border-light: #454545;
+
+  /* Text */
+  --vscode-foreground: #cccccc;
+  --vscode-foreground-dim: #969696;
+  --vscode-foreground-muted: #6e6e6e;
+
+  /* Accent */
+  --vscode-accent: #0078d4;
+  --vscode-accent-hover: #1a85d4;
+  --vscode-focus-border: #007fd4;
+
+  /* Status colors */
+  --vscode-success: #4ec9b0;
+  --vscode-warning: #cca700;
+  --vscode-error: #f14c4c;
+  --vscode-info: #3794ff;
+
+  /* Selection */
+  --vscode-selection: #264f78;
+  --vscode-list-hover: #2a2d2e;
+  --vscode-list-active: #37373d;
+}
+
+/* Apply dark theme globally */
+html {
+  background-color: var(--vscode-editor-bg);
+  color: var(--vscode-foreground);
+}
+
+body {
+  background-color: var(--vscode-editor-bg);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #5a5a5a;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6e6e6e;
+}
+
+/* Custom utility classes for VS Code theme */
+@layer utilities {
+  .bg-vscode-editor { background-color: var(--vscode-editor-bg); }
+  .bg-vscode-sidebar { background-color: var(--vscode-sidebar-bg); }
+  .bg-vscode-panel { background-color: var(--vscode-panel-bg); }
+  .bg-vscode-input { background-color: var(--vscode-input-bg); }
+  .bg-vscode-hover { background-color: var(--vscode-list-hover); }
+  .bg-vscode-active { background-color: var(--vscode-list-active); }
+  .bg-vscode-selection { background-color: var(--vscode-selection); }
+  .bg-vscode-border { background-color: var(--vscode-border); }
+
+  .border-vscode { border-color: var(--vscode-border); }
+  .border-vscode-light { border-color: var(--vscode-border-light); }
+
+  .text-vscode { color: var(--vscode-foreground); }
+  .text-vscode-dim { color: var(--vscode-foreground-dim); }
+  .text-vscode-muted { color: var(--vscode-foreground-muted); }
+
+  .text-vscode-accent { color: var(--vscode-accent); }
+  .bg-vscode-accent { background-color: var(--vscode-accent); }
+  .bg-vscode-accent-hover:hover { background-color: var(--vscode-accent-hover); }
+  .border-vscode-accent { border-color: var(--vscode-accent); }
+
+  .text-vscode-success { color: var(--vscode-success); }
+  .text-vscode-warning { color: var(--vscode-warning); }
+  .text-vscode-error { color: var(--vscode-error); }
+  .text-vscode-info { color: var(--vscode-info); }
+  .bg-vscode-success { background-color: var(--vscode-success); }
+  .bg-vscode-warning { background-color: var(--vscode-warning); }
+  .bg-vscode-error { background-color: var(--vscode-error); }
+  .bg-vscode-info { background-color: var(--vscode-info); }
+  .border-vscode-success { border-color: var(--vscode-success); }
+  .border-vscode-warning { border-color: var(--vscode-warning); }
+  .border-vscode-error { border-color: var(--vscode-error); }
+  .border-vscode-info { border-color: var(--vscode-info); }
+
+  .focus-vscode:focus {
+    outline: 1px solid var(--vscode-focus-border);
+    outline-offset: -1px;
+  }
+}
+
+/* Button base styles */
+button {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Input styles */
+input, textarea, select {
+  background-color: var(--vscode-input-bg);
+  border: 1px solid var(--vscode-border);
+  color: var(--vscode-foreground);
+  font-family: inherit;
+  font-size: inherit;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: 1px solid var(--vscode-focus-border);
+  outline-offset: -1px;
+  border-color: var(--vscode-focus-border);
+}
+
+/* Selection */
+::selection {
+  background-color: var(--vscode-selection);
+}

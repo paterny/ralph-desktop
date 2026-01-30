@@ -1,4 +1,4 @@
-use super::{CliAdapter, LineType, ParsedLine};
+use super::{CliAdapter, CommandOptions, LineType, ParsedLine};
 use crate::storage::models::CliType;
 use async_trait::async_trait;
 use serde::Deserialize;
@@ -59,7 +59,7 @@ impl CliAdapter for ClaudeCodeAdapter {
         }
     }
 
-    fn build_command(&self, prompt: &str, working_dir: &Path) -> Command {
+    fn build_command(&self, prompt: &str, working_dir: &Path, _options: CommandOptions) -> Command {
         let mut cmd = Command::new("claude");
         cmd.current_dir(working_dir)
             .arg("--print")
@@ -73,7 +73,12 @@ impl CliAdapter for ClaudeCodeAdapter {
         cmd
     }
 
-    fn build_readonly_command(&self, prompt: &str, working_dir: &Path) -> Command {
+    fn build_readonly_command(
+        &self,
+        prompt: &str,
+        working_dir: &Path,
+        _options: CommandOptions,
+    ) -> Command {
         let mut cmd = Command::new("claude");
         cmd.current_dir(working_dir)
             .arg("--print")

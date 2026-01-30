@@ -22,6 +22,8 @@ pub fn run() {
             commands::list_projects,
             commands::create_project,
             commands::get_project,
+            commands::set_project_skip_git_repo_check,
+            commands::init_project_git_repo,
             commands::delete_project,
             commands::detect_installed_clis,
             commands::get_config,

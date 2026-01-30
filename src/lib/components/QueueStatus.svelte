@@ -19,19 +19,19 @@
 
   const statusColor = $derived(() => {
     const status = $queueStatus;
-    if (status.runningCount > 0) return 'text-green-500';
-    if (status.queueLength > 0) return 'text-blue-500';
-    return 'text-gray-400';
+    if (status.runningCount > 0) return 'text-vscode-success';
+    if (status.queueLength > 0) return 'text-vscode-info';
+    return 'text-vscode-muted';
   });
 </script>
 
-<div class="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+<div class="flex items-center gap-2 px-3 py-2 bg-vscode-sidebar border-t border-vscode">
   <div class="flex items-center gap-1.5">
-    <div class="w-2 h-2 rounded-full {$queueStatus.runningCount > 0 ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}"></div>
+    <div class="w-2 h-2 rounded-full {$queueStatus.runningCount > 0 ? 'bg-vscode-success animate-pulse' : 'bg-vscode-border'}"></div>
     <span class="text-xs {statusColor()}">{statusText()}</span>
   </div>
   {#if $queueStatus.availableSlots > 0}
-    <span class="text-xs text-gray-400 ml-auto">
+    <span class="text-xs text-vscode-muted ml-auto">
       {$queueStatus.availableSlots} 槽位可用
     </span>
   {/if}

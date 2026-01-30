@@ -12,19 +12,19 @@
 
   function getBgColor(type: Notification['type']): string {
     switch (type) {
-      case 'success': return 'bg-green-100 dark:bg-green-900/30 border-green-500';
-      case 'error': return 'bg-red-100 dark:bg-red-900/30 border-red-500';
-      case 'warning': return 'bg-yellow-100 dark:bg-yellow-900/30 border-yellow-500';
-      case 'info': return 'bg-blue-100 dark:bg-blue-900/30 border-blue-500';
+      case 'success': return 'bg-vscode-panel border-vscode-success';
+      case 'error': return 'bg-vscode-panel border-vscode-error';
+      case 'warning': return 'bg-vscode-panel border-vscode-warning';
+      case 'info': return 'bg-vscode-panel border-vscode-info';
     }
   }
 
   function getTextColor(type: Notification['type']): string {
     switch (type) {
-      case 'success': return 'text-green-800 dark:text-green-200';
-      case 'error': return 'text-red-800 dark:text-red-200';
-      case 'warning': return 'text-yellow-800 dark:text-yellow-200';
-      case 'info': return 'text-blue-800 dark:text-blue-200';
+      case 'success': return 'text-vscode-success';
+      case 'error': return 'text-vscode-error';
+      case 'warning': return 'text-vscode-warning';
+      case 'info': return 'text-vscode-info';
     }
   }
 </script>
@@ -43,7 +43,7 @@
         {/if}
       </div>
       <button
-        class="flex-shrink-0 p-1 hover:bg-black/10 rounded {getTextColor(notification.type)}"
+        class="flex-shrink-0 p-1 hover:bg-vscode-hover rounded {getTextColor(notification.type)}"
         onclick={() => removeNotification(notification.id)}
       >
         ✕
