@@ -1,16 +1,17 @@
 mod adapters;
+mod auto_update;
 mod commands;
 mod engine;
 mod security;
 mod storage;
 
 use commands::AppState;
+use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // Ensure data directory exists
     let _ = storage::ensure_data_dir();
-
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
@@ -44,7 +45,23 @@ pub fn run() {
             commands::cancel_interrupted_task,
             commands::cleanup_logs,
             commands::get_project_logs,
+            // Update commands
+            commands::get_update_state,
+            commands::check_for_updates,
+            commands::load_update_state_cmd,
         ])
+        .setup(|app| {
+            let app_handle = app.handle().clone();
+            tauri::async_runtime::spawn(async move {
+                let _ = auto_update::apply_pending_update().await;
+                let mut loaded = auto_update::load_update_state().unwrap_or_default();
+                loaded.current_version = env!("CARGO_PKG_VERSION").to_string();
+                let state = app_handle.state::<AppState>();
+                let mut update_state = state.update_state.write().await;
+                *update_state = loaded;
+            });
+            Ok(())
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

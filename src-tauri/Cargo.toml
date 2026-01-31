@@ -1,6 +1,6 @@
 [package]
 name = "ralph-desktop"
-version = "0.1.4"
+version = "0.1.5"
 description = "Ralph Desktop - Visual Ralph Loop Controller"
 authors = ["刘小排"]
 edition = "2021"
@@ -28,3 +28,11 @@ regex = "1"
 dirs = "6"
 thiserror = "2"
 async-trait = "0.1"
+reqwest = { version = "0.12", features = ["json", "stream", "rustls-tls"] }
+semver = "1"
+sha2 = "0.10"
+hex = "0.4"
+futures-util = "0.3"
+
+[dev-dependencies]
+tempfile = "3"

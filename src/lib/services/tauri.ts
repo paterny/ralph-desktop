@@ -7,7 +7,8 @@ import type {
   CliInfo,
   CliType,
   ProjectStatus,
-  LoopEvent
+  LoopEvent,
+  UpdateState
 } from '../types';
 
 const isE2E = import.meta.env.VITE_E2E === '1';
@@ -298,6 +299,26 @@ const e2eState = (() => {
     listenToLoopEvents(callback: LoopListener) {
       listeners.add(callback);
       return () => listeners.delete(callback);
+    },
+    getUpdateState() {
+      const state: UpdateState = {
+        status: 'idle',
+        currentVersion: '0.0.0',
+        targetVersion: null,
+        lastCheckedAt: null,
+        failureCount: 0,
+        lastError: null,
+        downloadPath: null,
+        sha256: null,
+        pending: false
+      };
+      return state;
+    },
+    checkForUpdates() {
+      return this.getUpdateState();
+    },
+    loadUpdateState() {
+      return this.getUpdateState();
     }
   };
 })();
@@ -426,6 +447,22 @@ export async function cleanupLogs(): Promise<number> {
 export async function getProjectLogs(projectId: string): Promise<string[]> {
   if (isE2E) return e2eState.getProjectLogs(projectId);
   return invoke('get_project_logs', { projectId });
+}
+
+// Update Commands
+export async function getUpdateState(): Promise<UpdateState> {
+  if (isE2E) return e2eState.getUpdateState();
+  return invoke('get_update_state');
+}
+
+export async function checkForUpdates(idleOk: boolean): Promise<UpdateState> {
+  if (isE2E) return e2eState.checkForUpdates();
+  return invoke('check_for_updates', { idleOk });
+}
+
+export async function loadUpdateState(): Promise<UpdateState> {
+  if (isE2E) return e2eState.loadUpdateState();
+  return invoke('load_update_state_cmd');
 }
 
 // AI Brainstorm Types

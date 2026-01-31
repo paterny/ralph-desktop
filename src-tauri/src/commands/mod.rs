@@ -12,11 +12,13 @@ use uuid::Uuid;
 pub mod loop_commands;
 pub mod project_commands;
 pub mod recovery_commands;
+pub mod update_commands;
 
 /// Application state shared across commands
 #[derive(Clone)]
 pub struct AppState {
     pub running_loops: Arc<RwLock<HashMap<Uuid, Arc<LoopEngineHandle>>>>,
+    pub update_state: Arc<RwLock<crate::auto_update::UpdateState>>,
 }
 
 pub struct LoopEngineHandle {
@@ -29,6 +31,7 @@ impl Default for AppState {
     fn default() -> Self {
         Self {
             running_loops: Arc::new(RwLock::new(HashMap::new())),
+            update_state: Arc::new(RwLock::new(crate::auto_update::UpdateState::default())),
         }
     }
 }
@@ -37,3 +40,4 @@ impl Default for AppState {
 pub use loop_commands::*;
 pub use project_commands::*;
 pub use recovery_commands::*;
+pub use update_commands::*;

@@ -1,6 +1,31 @@
 // CLI Types
 export type CliType = 'claude' | 'codex' | 'opencode';
 export type Theme = 'light' | 'dark' | 'system';
+
+export type UpdateStatus =
+  | 'idle'
+  | 'checking'
+  | 'no_update'
+  | 'update_available'
+  | 'waiting_for_idle'
+  | 'downloading'
+  | 'verifying'
+  | 'self_test'
+  | 'ready_to_apply'
+  | 'applied_on_next_launch'
+  | 'failed';
+
+export interface UpdateState {
+  status: UpdateStatus;
+  currentVersion: string;
+  targetVersion?: string | null;
+  lastCheckedAt?: string | null;
+  failureCount: number;
+  lastError?: string | null;
+  downloadPath?: string | null;
+  sha256?: string | null;
+  pending: boolean;
+}
 export type ProjectStatus =
   | 'brainstorming'
   | 'ready'

@@ -1,6 +1,7 @@
 <script lang="ts">
   import '../app.css';
   import { onMount } from 'svelte';
+  import { get } from 'svelte/store';
   import { _ } from 'svelte-i18n';
   import '$lib/i18n';
   import { projects, currentProjectId, currentProject, updateProjects, updateCurrentProject, updateProjectStatus, selectProject } from '$lib/stores/projects';
@@ -13,13 +14,14 @@
   import * as api from '$lib/services/tauri';
   import { CODEX_GIT_REPO_CHECK_REQUIRED, startLoopWithGuard } from '$lib/services/loopStart';
   import { setLocaleFromConfig } from '$lib/i18n';
+  import { initAutoUpdate, checkForUpdatesIfIdle } from '$lib/stores/autoUpdate';
   import type { LoopEvent } from '$lib/types';
   import type { RecoveryInfo } from '$lib/services/tauri';
   import RecoveryDialog from '$lib/components/RecoveryDialog.svelte';
   import NotificationToast from '$lib/components/NotificationToast.svelte';
   import GitRepoCheckDialog from '$lib/components/GitRepoCheckDialog.svelte';
-  import { get } from 'svelte/store';
 
+  const loopState = $derived(getLoopState($loopStates, $currentProjectId));
   let { children } = $props();
   let initialized = $state(false);
   let showPermissionDialog = $state(false);
@@ -61,6 +63,10 @@
       // Listen to loop events
       await api.listenToLoopEvents(handleLoopEvent);
 
+      // Start auto-update scheduler
+      initAutoUpdate(isIdleForUpdate);
+      checkForUpdatesIfIdle(isIdleForUpdate());
+
       // Clean up old logs on startup
       await api.cleanupLogs();
 
@@ -70,6 +76,12 @@
       initialized = true; // Still show UI even on error
     }
   });
+
+  function isIdleForUpdate(): boolean {
+    const running = loopState?.status === 'running' || loopState?.status === 'pausing';
+    const queued = $projects?.some(p => p.status === 'queued');
+    return !running && !queued;
+  }
 
   function handleLoopEvent(event: LoopEvent) {
     const statusMap: Record<string, string> = {
@@ -140,6 +152,7 @@
     if (newStatus) {
       setStatus(projectId, newStatus as any);
       updateProjectStatus(event.projectId, newStatus as any);
+      checkForUpdatesIfIdle(isIdleForUpdate());
     }
   }
 
@@ -147,7 +160,7 @@
     const state = getLoopState(get(loopStates), projectId);
     const project = get(currentProject);
     const completionSignal = project?.id === projectId
-      ? project?.task?.completionSignal
+      ? (project?.task?.completionSignal ?? '<done>COMPLETE</done>')
       : '<done>COMPLETE</done>';
     const parts: string[] = [];
     let total = 0;
