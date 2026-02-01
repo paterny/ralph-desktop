@@ -9,8 +9,6 @@ use std::path::PathBuf;
 use std::sync::OnceLock;
 use tokio::process::Command;
 
-#[cfg(target_os = "windows")]
-use std::os::windows::process::CommandExt;
 
 /// Windows flag to prevent console window from appearing
 #[cfg(target_os = "windows")]
