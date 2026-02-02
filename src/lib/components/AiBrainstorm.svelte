@@ -156,6 +156,9 @@
 
   function handleKeydown(event: KeyboardEvent) {
     if (event.key === 'Enter' && !event.shiftKey) {
+      if (event.isComposing) {
+        return;
+      }
       event.preventDefault();
       if (currentQuestion?.options.length === 0 || showOtherInput) {
         handleSubmitText();
