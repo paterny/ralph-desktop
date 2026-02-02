@@ -178,6 +178,7 @@ impl CliAdapter for CodexAdapter {
 #[cfg(test)]
 mod tests {
     use super::CodexAdapter;
+    use crate::adapters::CliAdapter;
     use super::CommandOptions;
 
     #[test]
