@@ -154,10 +154,12 @@ impl CliAdapter for CodexAdapter {
                     }
                 }
                 _ => {
-                    // Unknown JSON event, pass through
+                    // No type field or unknown type - pass through as text
+                    // This handles: direct brainstorm JSON, unknown events, and Loop mode output
+                    // that happens to look like JSON (safer fallback to avoid losing content)
                     ParsedLine {
                         content: line.to_string(),
-                        line_type: LineType::Json,
+                        line_type: LineType::Text,
                         is_assistant: true,
                     }
                 }
