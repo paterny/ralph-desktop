@@ -138,6 +138,24 @@ pub async fn update_task_auto_init(
     Ok(state)
 }
 
+/// Update prompt content for a project's task
+#[tauri::command]
+pub async fn update_task_prompt(
+    project_id: String,
+    prompt: String,
+) -> Result<ProjectState, String> {
+    let uuid = Uuid::parse_str(&project_id).map_err(|e| e.to_string())?;
+    let mut state = storage::load_project_state(&uuid).map_err(|e| e.to_string())?;
+    let task = state
+        .task
+        .as_mut()
+        .ok_or("No task configured for this project")?;
+    task.prompt = prompt;
+    state.updated_at = Utc::now();
+    storage::save_project_state(&state).map_err(|e| e.to_string())?;
+    Ok(state)
+}
+
 /// Check if project directory is a git repository
 #[tauri::command]
 pub async fn check_project_git_repo(project_id: String) -> Result<bool, String> {
@@ -305,4 +323,86 @@ pub async fn get_project_logs(project_id: String) -> Result<Vec<String>, String>
     let uuid = Uuid::parse_str(&project_id).map_err(|e| e.to_string())?;
     let manager = crate::engine::logs::LogManager::new(uuid);
     manager.get_latest_session_log()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::env;
+    use std::ffi::{OsStr, OsString};
+    use tempfile::tempdir;
+
+    struct EnvVarGuard {
+        key: &'static str,
+        prev: Option<OsString>,
+    }
+
+    impl EnvVarGuard {
+        fn set(key: &'static str, value: impl AsRef<OsStr>) -> Self {
+            let prev = env::var_os(key);
+            env::set_var(key, value);
+            Self { key, prev }
+        }
+    }
+
+    impl Drop for EnvVarGuard {
+        fn drop(&mut self) {
+            if let Some(prev) = self.prev.take() {
+                env::set_var(self.key, prev);
+            } else {
+                env::remove_var(self.key);
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn update_task_prompt_persists_prompt() {
+        let _env_lock = crate::test_support::lock_env();
+        let home_dir = tempdir().unwrap();
+        let _home_guard = EnvVarGuard::set("HOME", home_dir.path());
+
+        let now = Utc::now();
+        let id = Uuid::new_v4();
+        let project_dir = tempdir().unwrap();
+
+        let initial_prompt = "old prompt".to_string();
+        let state = ProjectState {
+            id,
+            name: "Test".to_string(),
+            path: project_dir.path().to_string_lossy().to_string(),
+            status: ProjectStatus::Ready,
+            skip_git_repo_check: false,
+            brainstorm: None,
+            task: Some(TaskConfig {
+                prompt: initial_prompt,
+                design_doc_path: None,
+                cli: CliType::Codex,
+                max_iterations: 3,
+                auto_commit: false,
+                auto_init_git: false,
+                completion_signal: "<done>COMPLETE</done>".to_string(),
+            }),
+            execution: None,
+            created_at: now,
+            updated_at: now,
+        };
+        storage::save_project_state(&state).unwrap();
+
+        let updated_prompt = "new prompt content".to_string();
+        let updated = update_task_prompt(id.to_string(), updated_prompt.clone())
+            .await
+            .expect("update prompt");
+        assert_eq!(
+            updated.task.as_ref().map(|t| t.prompt.as_str()),
+            Some(updated_prompt.as_str())
+        );
+
+        let loaded = storage::load_project_state(&id).expect("load updated state");
+        assert_eq!(
+            loaded.task.as_ref().map(|t| t.prompt.as_str()),
+            Some(updated_prompt.as_str())
+        );
+
+        let _ = storage::delete_project_data(&id);
+    }
 }

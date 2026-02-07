@@ -3,7 +3,7 @@
   import type { LoopStoreState } from "$lib/stores/loop";
   import * as api from "$lib/services/tauri";
   import { startLoopWithGuard } from "$lib/services/loopStart";
-  import { updateCurrentProject } from "$lib/stores/projects";
+  import { currentProjectId, updateCurrentProject } from "$lib/stores/projects";
   import { _ } from "svelte-i18n";
   import LogViewer from "./LogViewer.svelte";
   import PromptEditor from "./PromptEditor.svelte";
@@ -266,6 +266,15 @@
       console.error("Failed to update max iterations:", error);
     }
   }
+
+  async function handlePromptSave(prompt: string) {
+    const savingProjectId = project.id;
+    const updated = await api.updateTaskPrompt(savingProjectId, prompt);
+    // Avoid overwriting the selected project if user switched tabs during async save.
+    if ($currentProjectId === savingProjectId) {
+      updateCurrentProject(updated);
+    }
+  }
 </script>
 
 <div class="flex-1 flex flex-col overflow-hidden">
@@ -417,7 +426,9 @@
         </div>
         {#if showPrompt}
           <div class="mt-3">
-            <PromptEditor {project} />
+            {#key project.id}
+              <PromptEditor {project} onSave={handlePromptSave} />
+            {/key}
           </div>
         {/if}
       </div>

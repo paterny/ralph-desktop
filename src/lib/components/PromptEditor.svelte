@@ -4,27 +4,45 @@
 
   interface Props {
     project: ProjectState;
-    onSave?: (prompt: string) => void;
+    onSave?: (prompt: string) => void | Promise<void>;
     onCancel?: () => void;
   }
 
   let { project, onSave, onCancel }: Props = $props();
 
-  let editedPrompt = $state(project.task?.prompt || '');
+  let editedPrompt = $state('');
   let isEditing = $state(false);
+  let saving = $state(false);
+  let saveError = $state<string | null>(null);
+
+  $effect(() => {
+    if (!isEditing) {
+      editedPrompt = project.task?.prompt || '';
+    }
+  });
 
   function handleEdit() {
+    saveError = null;
     isEditing = true;
   }
 
-  function handleSave() {
-    onSave?.(editedPrompt);
-    isEditing = false;
+  async function handleSave() {
+    saving = true;
+    saveError = null;
+    try {
+      await onSave?.(editedPrompt);
+      isEditing = false;
+    } catch (error) {
+      saveError = error instanceof Error ? error.message : String(error);
+    } finally {
+      saving = false;
+    }
   }
 
   function handleCancel() {
     editedPrompt = project.task?.prompt || '';
     isEditing = false;
+    saveError = null;
     onCancel?.();
   }
 
@@ -64,6 +82,7 @@
         <button
           class="px-3 py-1 text-sm bg-vscode-accent bg-vscode-accent-hover rounded text-white"
           onclick={handleSave}
+          disabled={saving}
         >
           {$_('prompt.save')}
         </button>
@@ -79,6 +98,11 @@
         bind:value={editedPrompt}
         placeholder={$_('prompt.placeholder')}
       ></textarea>
+      {#if saveError}
+        <div class="mt-2 text-xs text-vscode-error">
+          {$_('task.errorPrefix')} {saveError}
+        </div>
+      {/if}
     {:else}
       <div class="max-h-64 overflow-y-auto">
         <pre class="whitespace-pre-wrap font-mono text-sm text-vscode bg-vscode-editor p-3 rounded-lg border border-vscode">{editedPrompt || $_('prompt.empty')}</pre>

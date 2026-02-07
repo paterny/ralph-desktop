@@ -4,6 +4,8 @@ mod commands;
 mod engine;
 mod security;
 mod storage;
+#[cfg(test)]
+mod test_support;
 
 use commands::AppState;
 use tauri::Manager;
@@ -27,6 +29,7 @@ pub fn run() {
             commands::update_task_max_iterations,
             commands::update_task_auto_commit,
             commands::update_task_auto_init,
+            commands::update_task_prompt,
             commands::init_project_git_repo,
             commands::check_project_git_repo,
             commands::delete_project,
